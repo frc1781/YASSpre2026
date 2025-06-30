@@ -14,7 +14,7 @@ vision and odometry.
 5. Open this link as a reference, yagsl: https://docs.yagsl.com/
 7. Look in src\main\deploy\swerve and you will see two sample swerve folders: ava and ralph.  Copy or rename one of these to the name of your robot and you will start editing those values.
 8. To help with that, open https://broncbotz3481.github.io/YAGSL-Example/
-9. Let's start with swervedrive.json.  You need to know the type of IMU you have (navX or pidgeon or something else there's a big dropdown) and the CAN id of the IMU.  Enter those in and the generated json will change.  When you
+9. Let's start with swervedrive.json.  You need to know the type of IMU you have (navX or pidgeon or something else there's a big dropdown) and the CAN id of the IMU.  Enter those and the generated json will change.  When you
    get what looks right, copy the code into the swervedrive.json you just copied.  The rest of the values are probably unchanged.
 10. Next we will work on physicalproperties.json.  You probably only need to find the drive and steer gear ratios. You can find that from your swerve drive manufacturer.  Also, the diameter is the for your wheel
     diameter in inches (by default that is 4, which might be correct already).  The gear ratios are probably the hardest to find.
