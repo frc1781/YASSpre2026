@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -38,6 +39,7 @@ public class RobotContainer
   // private final Climber climber = new Climber();
 
   private final SendableChooser<Command> autoChooser;
+  private double wait_seconds = 5;
 
   //Trigger coralEnter = new Trigger(sensation::coralPresent);
  // Trigger coralHopper = new Trigger(sensation::coralInHopper);
@@ -84,11 +86,12 @@ public class RobotContainer
   public RobotContainer()
   {
     configureBindings();
-    
+
     DriverStation.silenceJoystickConnectionWarning(true);
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    SmartDashboard.add("Wait Time", wait_seconds)
+    NamedCommands.registerCommand("CustomWait", new WaitCommand(wait_seconds));
   }
 
   private void configureBindings()
