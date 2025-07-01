@@ -57,7 +57,7 @@ public class SwerveSubsystem extends SubsystemBase
 {
   private final SwerveDrive swerveDrive;
   private final boolean     visionDriveTest = true;
-  private       Vision      vision;
+  //private       Vision      vision;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -111,7 +111,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   public void setupPhotonVision()
   {
-    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+    //vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
   @Override
@@ -121,7 +121,7 @@ public class SwerveSubsystem extends SubsystemBase
     if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
+      //vision.updatePoseEstimation(swerveDrive);
     }
   }
 
