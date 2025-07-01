@@ -4,8 +4,10 @@ code base and instructions on robot hardware you should be able to create a swer
 can follow autonomous routines developed with path planner and that has localization determined by 
 vision and odometry.
 
-## Step by step for implementation on your robot
+## How to put YAGSL on your robot!
+See our step by step guide here: https://github.com/Chicago-Robotics-Alliance/documentation/blob/main/2025_YAGSL.md
 
+move these to your doc:
 1. Clone and fork this repository.
 2. Open this new cloned folder in VS Code 2025.
 3. Build the code.  If you are in CPS you will probably not be able to access any of the referenced libraries in github.io so you might have to build at home. 
