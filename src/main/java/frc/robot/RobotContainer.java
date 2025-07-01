@@ -90,8 +90,8 @@ public class RobotContainer
     DriverStation.silenceJoystickConnectionWarning(true);
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    SmartDashboard.add("Wait Time", wait_seconds)
-    NamedCommands.registerCommand("CustomWait", new WaitCommand(wait_seconds));
+    SmartDashboard.putNumber("Wait Time", wait_seconds);
+    NamedCommands.registerCommand("CustomWaitCommand", new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
   }
 
   private void configureBindings()
