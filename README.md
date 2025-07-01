@@ -4,4 +4,4 @@ code base and instructions on robot hardware you should be able to create a swer
 can follow autonomous routines developed with path planner and that has localization determined by 
 vision and odometry.
 
-## [How to put YAGSL on your robot!](https://github.com/Chicago-Robotics-Alliance/documentation/blob/main/2025_YAGSL.md)
+## 🛠️ [How to put YAGSL on your robot!](https://github.com/Chicago-Robotics-Alliance/documentation/blob/main/2025_YAGSL.md)
