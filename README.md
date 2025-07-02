@@ -5,5 +5,5 @@ can follow autonomous routines developed with path planner and that has localiza
 vision and odometry.
 
 🛠️ [How to put YAGSL on your robot!](https://github.com/Chicago-Robotics-Alliance/documentation/blob/main/2025_YAGSL.md)
-
+🔗 [Chicago Robotics Alliance | Post 2025 | Open Alliance](https://www.chiefdelphi.com/t/chicago-robotics-alliance-post-2025-open-alliance/503770)
 🤖 [How to run some pre-built autonomous paths!](https://github.com/Chicago-Robotics-Alliance/documentation/blob/main/2025_PathPlanner.md)
