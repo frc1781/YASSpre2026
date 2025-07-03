@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  * 
  * This class allows for live adjustment of PID controller parameters (kP, kI, kD, kF)
  * through the Shuffleboard interface, enabling quick tuning during robot operation.
+ * Check in CRA/ExampleMechanism.java for an example implmenetation.
  * 
  * Usage:
  * - Create an instance of PIDTuning with a unique mechanism name and initial PID values.
