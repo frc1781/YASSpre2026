@@ -69,15 +69,7 @@ public class Climber extends SubsystemBase {
     }
 
     public static double clamp(double min, double max, double value) {
-        if (value > max) {
-            return max;
-        }
-        else if (value < min) {
-            return min;
-        }
-        else {
-            return value;
-        }
+        return Math.max(min, Math.min(value, max));
     }
 
 }
