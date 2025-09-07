@@ -52,7 +52,7 @@ public class Climber extends SubsystemBase {
         }
         
         climberDutyCycle = climberPID.calculate(armEncoder.getPosition(), requestedPosition) + gravityDutyCycle;
-        climberDutyCycle = CRA.Util.clamp(-0.5, 0.5, climberDutyCycle);
+        climberDutyCycle = clamp(-0.5, 0.5, climberDutyCycle);
         motor.set(climberDutyCycle);
     }
 
@@ -67,4 +67,17 @@ public class Climber extends SubsystemBase {
             requestedPosition += .03;
         }, this).repeatedly();
     }
+
+    public static double clamp(double min, double max, double value) {
+        if (value > max) {
+            return max;
+        }
+        else if (value < min) {
+            return min;
+        }
+        else {
+            return value;
+        }
+    }
+
 }
