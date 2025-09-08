@@ -62,6 +62,7 @@ public final class Constants
 
   public static class Conveyor {
     public static final int MOTOR_CAN_ID = 15;
+    public static final int CURRENT_LIMIT = 30;
   }
 
  public class Climber {
