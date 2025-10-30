@@ -25,7 +25,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+
+import static edu.wpi.first.units.Units.Degrees;
+
 import java.io.File;
+import frc.robot.subsystems.ArmSubsystem;
 
 import swervelib.SwerveInputStream;
 
@@ -38,6 +42,7 @@ public class RobotContainer
   // private final Conveyor conveyor = new Conveyor();
   // private final Lights lights = new Lights();
   // private final Climber climber = new Climber();
+  private final ArmSubsystem arm = new ArmSubsystem();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
 
@@ -146,8 +151,8 @@ public class RobotContainer
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      driverXbox.leftBumper().whileTrue(arm.setAngle(Degrees.of(0)));
+      driverXbox.rightBumper().whileTrue(arm.setAngle(Degrees.of(-90)));
      // driverXbox.povUp().whileTrue(climber.ascend());
      // driverXbox.povDown().whileTrue(climber.descend());
      // driverXbox.y().onTrue(lights.set(Lights.Special.RAINBOW));
