@@ -37,7 +37,7 @@ public class RobotContainer
 {
   final CommandXboxController driverXbox = new CommandXboxController(0);
   //private final Sensation sensation = new Sensation();
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/robot"));
+  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/ava"));
   // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
   // private final Conveyor conveyor = new Conveyor();
   // private final Lights lights = new Lights();
@@ -119,8 +119,9 @@ public class RobotContainer
     }
 
     //conveyor.setDefaultCommand(conveyor.clearCoral(coralHopper));
-   // lights.setDefaultCommand(lights.set(Lights.Special.OFF));
-   // climber.setDefaultCommand(climber.idle());
+    // lights.setDefaultCommand(lights.set(Lights.Special.OFF));
+    // climber.setDefaultCommand(climber.idle());
+    arm.setDefaultCommand(arm.armCmd(0.0));
 
     if (Robot.isSimulation())
     {
@@ -151,11 +152,14 @@ public class RobotContainer
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(arm.setAngle(Degrees.of(0)));
-      driverXbox.rightBumper().whileTrue(arm.setAngle(Degrees.of(-90)));
+      driverXbox.povUp().whileTrue(arm.armCmd(1));
+      driverXbox.povDown().whileTrue(arm.armCmd(-1));
+      driverXbox.y().onTrue(arm.setAngle(Degrees.of(70)));
+      driverXbox.b().onTrue(arm.setAngle(Degrees.of(0)));
+      driverXbox.a().onTrue(arm.setAngle(Degrees.of(-40)));
      // driverXbox.povUp().whileTrue(climber.ascend());
      // driverXbox.povDown().whileTrue(climber.descend());
-     // driverXbox.y().onTrue(lights.set(Lights.Special.RAINBOW));
+     //driverXbox.y().onTrue(lights.set(Lights.Special.RAINBOW));
      // driverXbox.b().onTrue(lights.set(Lights.Colors.WHITE, Lights.Patterns.MARCH));
 
       //coralEnter.and(coralExit.negate()).and(coralHopper.negate()).onTrue(lights.set(Lights.Colors.RED, Lights.Patterns.FAST_FLASH));
