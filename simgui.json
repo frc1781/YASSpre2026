@@ -96,11 +96,6 @@
           "visible": true
         }
       },
-      "/SmartDashboard/ArmExample/mechanism": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Field": {
         "OdometryPose": {
           "arrowColor": [

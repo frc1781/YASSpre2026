@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Rotations;
@@ -66,13 +67,12 @@ public class ArmSubsystem extends SubsystemBase
 
   private final SmartMotorController motor = new SparkWrapper(armMotor, DCMotor.getNEO(1), motorConfig);
   private final MechanismPositionConfig robotToMechanism = new MechanismPositionConfig()
-      .withMaxRobotHeight(Meters.of(1.5))
-      .withMaxRobotLength(Meters.of(0.75))
-      .withRelativePosition(new Translation3d(Meters.of(0), Meters.of(0), Meters.of(0.5)));
-
+      .withMaxRobotHeight(Meters.of(2))
+      .withMaxRobotLength(Meters.of(2))
+      .withRelativePosition(new Translation3d(Inches.of(5), Inches.of(0), Inches.of(40)));
 
   private ArmConfig m_config = new ArmConfig(motor)
-      .withLength(Meters.of(0.135))
+      .withLength(Inches.of(22))
       .withHardLimit(Degrees.of(-90), Degrees.of(90))
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
       .withMass(Pounds.of(1))
