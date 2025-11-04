@@ -67,12 +67,12 @@ public class ArmSubsystem extends SubsystemBase
 
   private final SmartMotorController motor = new SparkWrapper(armMotor, DCMotor.getNEO(1), motorConfig);
   private final MechanismPositionConfig robotToMechanism = new MechanismPositionConfig()
-      .withMaxRobotHeight(Meters.of(2))
-      .withMaxRobotLength(Meters.of(2))
-      .withRelativePosition(new Translation3d(Inches.of(5), Inches.of(0), Inches.of(40)));
+      .withMaxRobotHeight(Meters.of(1))
+      .withMaxRobotLength(Meters.of(1.2))
+      .withRelativePosition(new Translation3d(Inches.of(5), Inches.of(0), Inches.of(20)));
 
   private ArmConfig m_config = new ArmConfig(motor)
-      .withLength(Inches.of(22))
+      .withLength(Inches.of(25))
       .withHardLimit(Degrees.of(-90), Degrees.of(90))
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
       .withMass(Pounds.of(1))
