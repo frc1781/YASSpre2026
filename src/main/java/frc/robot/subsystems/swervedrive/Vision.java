@@ -356,12 +356,12 @@ public class Vision
 
     LEFT_CAM("LeftApriltag",
           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-25), Units.degreesToRadians(-20)),
-          new Translation3d(Units.inchesToMeters(8.5), Units.inchesToMeters(-8.5), Units.inchesToMeters(6.5)),
+          new Translation3d(Units.inchesToMeters(8.5), Units.inchesToMeters(8.5), Units.inchesToMeters(6.5)),
              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
     RIGHT_CAM("RightApriltag",
               new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-25), Units.degreesToRadians(20)),
-              new Translation3d(Units.inchesToMeters(8.5), Units.inchesToMeters(8.5), Units.inchesToMeters(6.5)),
+              new Translation3d(Units.inchesToMeters(8.5), Units.inchesToMeters(-8.5), Units.inchesToMeters(6.5)),
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
     // LEFT_SIDE_CAM("LeftSide",
