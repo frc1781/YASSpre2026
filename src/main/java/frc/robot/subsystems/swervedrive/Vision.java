@@ -69,6 +69,8 @@ public class Vision
    */
   private Field2d field2d;
 
+  public static List<Pose3d> seenAprilTags = new ArrayList<>();
+  public static List<Integer> seenAprilTagIDs = new ArrayList<>();
 
   /**
    * Constructor for the Vision class.
@@ -94,6 +96,14 @@ public class Vision
       openSimCameraViews();
     }
   }
+
+  public List<Pose3d> getSeenAprilTags() {
+    return seenAprilTags;
+} 
+
+public List<Integer> getSeenAprilTagIDs() {
+  return seenAprilTagIDs;
+}
 
   /**
    * Calculates a target pose relative to an AprilTag on the field.
