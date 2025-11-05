@@ -40,14 +40,20 @@ import yams.motorcontrollers.local.SparkWrapper;
 public class ArmSubsystem extends SubsystemBase
 {
 
-  private final SparkMax armMotor = new SparkMax(13, MotorType.kBrushless);
-  //  private final SmartMotorControllerTelemetryConfig motorTelemetryConfig = new SmartMotorControllerTelemetryConfig()
-//          .withMechanismPosition()
-//          .withRotorPosition()
-//          .withMechanismLowerLimit()
-//          .withMechanismUpperLimit();
+  private final SparkMax armMotor;
 
-  private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
+  private final SmartMotorControllerConfig motorConfig;
+  private final SmartMotorController motor;
+  private final MechanismPositionConfig robotToMechanism;
+
+  private ArmConfig m_config;
+  private final Arm arm;
+
+  public ArmSubsystem ()
+  {
+    armMotor = new SparkMax(13, MotorType.kBrushless);
+
+    motorConfig = new SmartMotorControllerConfig(this)
       .withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
       .withSoftLimit(Degrees.of(-75), Degrees.of(90))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
@@ -55,7 +61,6 @@ public class ArmSubsystem extends SubsystemBase
       .withZeroOffset(Rotations.of(0.315))
       .withIdleMode(MotorMode.BRAKE)
       .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-//      .withSpecificTelemetry("ArmMotor", motorTelemetryConfig)
       .withStatorCurrentLimit(Amps.of(30))
       .withVoltageCompensation(Volts.of(12))
       .withMotorInverted(false)
@@ -65,13 +70,13 @@ public class ArmSubsystem extends SubsystemBase
       .withControlMode(ControlMode.CLOSED_LOOP);
 
 
-  private final SmartMotorController motor = new SparkWrapper(armMotor, DCMotor.getNEO(1), motorConfig);
-  private final MechanismPositionConfig robotToMechanism = new MechanismPositionConfig()
+    motor = new SparkWrapper(armMotor, DCMotor.getNEO(1), motorConfig);
+    robotToMechanism = new MechanismPositionConfig()
       .withMaxRobotHeight(Meters.of(1))
       .withMaxRobotLength(Meters.of(1.2))
       .withRelativePosition(new Translation3d(Inches.of(5), Inches.of(0), Inches.of(20)));
 
-  private ArmConfig m_config = new ArmConfig(motor)
+    m_config = new ArmConfig(motor)
       .withLength(Inches.of(25))
       .withHardLimit(Degrees.of(-90), Degrees.of(90))
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
@@ -79,11 +84,7 @@ public class ArmSubsystem extends SubsystemBase
       .withStartingPosition(Degrees.of(80))
       .withHorizontalZero(Degrees.of(0))
       .withMechanismPositionConfig(robotToMechanism);
-  private final Arm arm = new Arm(m_config);
-
-  public ArmSubsystem ()
-  {
-
+    arm = new Arm(m_config);
   }
 
   public void periodic()
@@ -113,4 +114,5 @@ public class ArmSubsystem extends SubsystemBase
     Logger.recordOutput("Arm/setAngle", angle);
     return arm.setAngle(angle);
   }
+
 }
