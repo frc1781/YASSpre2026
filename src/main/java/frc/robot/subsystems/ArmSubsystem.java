@@ -66,7 +66,7 @@ public class ArmSubsystem extends SubsystemBase
       .withMotorInverted(false)
       .withClosedLoopRampRate(Seconds.of(0.25))
       .withOpenLoopRampRate(Seconds.of(0.25))
-      .withFeedforward(new ArmFeedforward(0.15, 0.9, 0.8, 0.3))
+      .withFeedforward(new ArmFeedforward(0.0, .9, 0.0, 0.0))
       .withControlMode(ControlMode.CLOSED_LOOP);
 
 
@@ -77,11 +77,11 @@ public class ArmSubsystem extends SubsystemBase
       .withRelativePosition(new Translation3d(Inches.of(5), Inches.of(0), Inches.of(20)));
 
     m_config = new ArmConfig(motor)
-      .withLength(Inches.of(25))
+      .withLength(Inches.of(20))
       .withHardLimit(Degrees.of(-90), Degrees.of(90))
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
-      .withMass(Pounds.of(1))
-      .withStartingPosition(Degrees.of(80))
+      .withMass(Pounds.of(7))
+      .withStartingPosition(Degrees.of(0))
       .withHorizontalZero(Degrees.of(0))
       .withMechanismPositionConfig(robotToMechanism);
     arm = new Arm(m_config);
