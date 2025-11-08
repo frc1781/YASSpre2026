@@ -66,7 +66,7 @@ public class ArmSubsystem extends SubsystemBase
       .withMotorInverted(false)
       .withClosedLoopRampRate(Seconds.of(0.25))
       .withOpenLoopRampRate(Seconds.of(0.25))
-      .withFeedforward(new ArmFeedforward(0.0, 0.9, 0, 0))
+      .withFeedforward(new ArmFeedforward(0.0, 0.2, 0, 0))
       .withControlMode(ControlMode.CLOSED_LOOP);
 
 
