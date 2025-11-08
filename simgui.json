@@ -76,6 +76,10 @@
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/IMU": "Alerts",
       "/SmartDashboard/JSON": "Alerts",
+      "/SmartDashboard/Mechanisms/Arm/ArmMotor/Commands/Down": "Command",
+      "/SmartDashboard/Mechanisms/Arm/ArmMotor/Commands/LiveTuning": "Command",
+      "/SmartDashboard/Mechanisms/Arm/ArmMotor/Commands/Up": "Command",
+      "/SmartDashboard/Mechanisms/Arm/ArmMotor/Commands/ZeroEncoder": "Command",
       "/SmartDashboard/Mechanisms/Arm/ArmMotor/LiveTuning": "Command",
       "/SmartDashboard/Mechanisms/ArmExample/ArmMotor/LiveTuning": "Command",
       "/SmartDashboard/Motors": "Alerts",
@@ -92,6 +96,11 @@
     },
     "windows": {
       "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Arm/mechanism": {
         "window": {
           "visible": true
         }

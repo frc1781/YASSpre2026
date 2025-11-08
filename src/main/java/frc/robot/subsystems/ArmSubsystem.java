@@ -55,10 +55,10 @@ public class ArmSubsystem extends SubsystemBase
 
     motorConfig = new SmartMotorControllerConfig(this)
       .withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
-      .withSoftLimit(Degrees.of(-75), Degrees.of(90))
+      .withSoftLimit(Degrees.of(-20), Degrees.of(70))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 2 )))  //Disclaimer: Might not be completely right, needs to be checked later
       .withExternalEncoder(armMotor.getAbsoluteEncoder())
-      .withZeroOffset(Rotations.of(0.315))
+      //.withZeroOffset(Rotations.of(0.315))
       .withIdleMode(MotorMode.BRAKE)
       .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
       .withStatorCurrentLimit(Amps.of(30))
@@ -66,7 +66,7 @@ public class ArmSubsystem extends SubsystemBase
       .withMotorInverted(false)
       .withClosedLoopRampRate(Seconds.of(0.25))
       .withOpenLoopRampRate(Seconds.of(0.25))
-      .withFeedforward(new ArmFeedforward(0.0, 0.08, 0, 0))
+      .withFeedforward(new ArmFeedforward(0.0, 0.9, 0, 0))
       .withControlMode(ControlMode.CLOSED_LOOP);
 
 
