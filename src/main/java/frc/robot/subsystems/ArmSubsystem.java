@@ -55,10 +55,9 @@ public class ArmSubsystem extends SubsystemBase
 
     motorConfig = new SmartMotorControllerConfig(this)
       .withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
-      .withSoftLimit(Degrees.of(-20), Degrees.of(70))
+      .withSoftLimit(Degrees.of(-50), Degrees.of(70))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 2 )))  //Disclaimer: Might not be completely right, needs to be checked later
-      .withExternalEncoder(armMotor.getAbsoluteEncoder())
-      //.withZeroOffset(Rotations.of(0.315))
+      // .withExternalEncoder(armMotor.getAbsoluteEncoder())
       .withIdleMode(MotorMode.BRAKE)
       .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
       .withStatorCurrentLimit(Amps.of(30))
@@ -66,7 +65,7 @@ public class ArmSubsystem extends SubsystemBase
       .withMotorInverted(false)
       .withClosedLoopRampRate(Seconds.of(0.25))
       .withOpenLoopRampRate(Seconds.of(0.25))
-      .withFeedforward(new ArmFeedforward(0.0, 0.2, 0, 0))
+      .withFeedforward(new ArmFeedforward(0.0, 1.14, 0, 0))
       .withControlMode(ControlMode.CLOSED_LOOP);
 
 
@@ -80,9 +79,9 @@ public class ArmSubsystem extends SubsystemBase
       .withLength(Inches.of(25))
       .withHardLimit(Degrees.of(-90), Degrees.of(90))
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
-      .withMass(Pounds.of(1))
-      .withStartingPosition(Degrees.of(80))
-      .withHorizontalZero(Degrees.of(0))
+      .withMass(Pounds.of(7))
+      .withStartingPosition(Degrees.of(90))
+      // .withHorizontalZero(Degrees.of(205))
       .withMechanismPositionConfig(robotToMechanism);
     arm = new Arm(m_config);
   }
@@ -90,6 +89,8 @@ public class ArmSubsystem extends SubsystemBase
   public void periodic()
   {
     Logger.recordOutput("Arm/position", arm.getAngle());
+    Logger.recordOutput("Arm/voltage", arm.getMotor().getVoltage());
+    Logger.recordOutput("Arm/dutycycle", arm.getMotor().getDutyCycle());
     arm.updateTelemetry();
   }
 
