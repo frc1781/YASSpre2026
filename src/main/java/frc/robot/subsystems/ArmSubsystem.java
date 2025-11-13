@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -68,7 +67,6 @@ public class ArmSubsystem extends SubsystemBase
       .withFeedforward(new ArmFeedforward(0.0, 1.14, 0, 0))
       .withControlMode(ControlMode.CLOSED_LOOP);
 
-
     motor = new SparkWrapper(armMotor, DCMotor.getNEO(1), motorConfig);
     robotToMechanism = new MechanismPositionConfig()
       .withMaxRobotHeight(Meters.of(1))
@@ -114,6 +112,5 @@ public class ArmSubsystem extends SubsystemBase
   {
     Logger.recordOutput("Arm/setAngle", angle);
     return arm.setAngle(angle);
-  }
-
+  } 
 }
