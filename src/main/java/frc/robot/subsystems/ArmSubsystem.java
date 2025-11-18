@@ -55,7 +55,7 @@ public class ArmSubsystem extends SubsystemBase
     motorConfig = new SmartMotorControllerConfig(this)
       .withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
       .withSoftLimit(Degrees.of(-50), Degrees.of(70))
-      .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 1.889 ))) //COMPLETELY CORRECT ACCORDING TO ADITYA (WHICH IS GUARANTEED TO BE CORRECT)
+      .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 1.889))) //COMPLETELY CORRECT ACCORDING TO ADITYA (WHICH IS GUARANTEED TO BE CORRECT) (Well not anymore)
       // .withExternalEncoder(armMotor.getAbsoluteEncoder())
       .withIdleMode(MotorMode.BRAKE)
       .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
