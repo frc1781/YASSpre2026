@@ -11,17 +11,26 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static yams.mechanisms.SmartMechanism.gearbox;
 import static yams.mechanisms.SmartMechanism.gearing;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import CRA.FeedForwardTuning;
+
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.EntryBase;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.gearing.GearBox;
@@ -45,26 +54,37 @@ public class ArmSubsystem extends SubsystemBase
   private final SmartMotorController motor;
   private final MechanismPositionConfig robotToMechanism;
 
+  private ArmFeedforward armFeedforward;
+  private FeedForwardTuning armFeedForwardTuning;
+
+  private GenericEntry armDC;
+  private ShuffleboardTab tab;
+
   private ArmConfig m_config;
   private final Arm arm;
 
   public ArmSubsystem ()
   {
     armMotor = new SparkMax(13, MotorType.kBrushless);
+    armFeedforward = new ArmFeedforward(0.0, 1.14, 0, 0);
+    armFeedForwardTuning = new FeedForwardTuning(getName(), armFeedforward.getKs(), armFeedforward.getKg(), armFeedforward.getKv(), armFeedforward.getKa());
+
+    tab = Shuffleboard.getTab(getName());
+    armDC = tab.add(getName() + " armDC", armDC).getEntry();
 
     motorConfig = new SmartMotorControllerConfig(this)
-      .withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
-      .withSoftLimit(Degrees.of(-50), Degrees.of(70))
-      .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 1.889))) //COMPLETELY CORRECT ACCORDING TO ADITYA (WHICH IS GUARANTEED TO BE CORRECT) (Well not anymore)
+      .withClosedLoopController(0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
+      .withSoftLimit(Degrees.of(-90), Degrees.of(90))
+      .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 1.889))) 
       // .withExternalEncoder(armMotor.getAbsoluteEncoder())
       .withIdleMode(MotorMode.BRAKE)
       .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
       .withStatorCurrentLimit(Amps.of(30))
       .withVoltageCompensation(Volts.of(12))
       .withMotorInverted(true)
-      .withClosedLoopRampRate(Seconds.of(0.25))
+      .withClosedLoopRampRate(Seconds.of(0.25)) 
       .withOpenLoopRampRate(Seconds.of(0.25))
-      .withFeedforward(new ArmFeedforward(0.0, 1.14, 0, 0))
+      .withFeedforward(armFeedforward)
       .withControlMode(ControlMode.CLOSED_LOOP);
 
     motor = new SparkWrapper(armMotor, DCMotor.getNEO(1), motorConfig);
@@ -78,7 +98,7 @@ public class ArmSubsystem extends SubsystemBase
       .withHardLimit(Degrees.of(-90), Degrees.of(90))
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
       .withMass(Pounds.of(7))
-      .withStartingPosition(Degrees.of(90))
+      .withStartingPosition(Degrees.of(-90))
       // .withHorizontalZero(Degrees.of(205))
       .withMechanismPositionConfig(robotToMechanism);
     arm = new Arm(m_config);
@@ -89,6 +109,14 @@ public class ArmSubsystem extends SubsystemBase
     Logger.recordOutput("Arm/position", arm.getAngle());
     Logger.recordOutput("Arm/voltage", arm.getMotor().getVoltage());
     Logger.recordOutput("Arm/dutycycle", arm.getMotor().getDutyCycle());
+
+    arm.getMotorController().setFeedforward(
+      armFeedForwardTuning.getFeedForward()[0],
+      armFeedForwardTuning.getFeedForward()[1],
+      armFeedForwardTuning.getFeedForward()[2],
+      armFeedForwardTuning.getFeedForward()[3]
+    );
+
     arm.updateTelemetry();
   }
 
@@ -103,9 +131,14 @@ public class ArmSubsystem extends SubsystemBase
     return arm.set(dutycycle);
   }
 
+  public Command armDCFromNetworkTables() {
+    Logger.recordOutput("Arn.dc", armDC.getDouble(0));
+    return arm.set(armDC.getDouble(0));
+  }
+
   public Command sysId()
   {
-    return arm.sysId(Volts.of(3), Volts.of(3).per(Second), Second.of(30));
+    return arm.sysId(Volts.of(1.5), Volts.of(0.3).per(Second), Second.of(30));
   }
 
   public Command setAngle(Angle angle)
