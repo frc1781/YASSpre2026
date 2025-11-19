@@ -140,6 +140,11 @@
     }
   },
   "NetworkTables": {
+    "retained": {
+      ".schema": {
+        "open": true
+      }
+    },
     "transitory": {
       "LiveWindow": {
         "open": true
