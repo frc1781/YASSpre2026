@@ -42,7 +42,7 @@ public class RobotContainer
   // private final Conveyor conveyor = new Conveyor();
   // private final Lights lights = new Lights();
   // private final Climber climber = new Climber();
-  private final ArmSubsystem arm = new ArmSubsystem();
+  //private final ArmSubsystem arm = new ArmSubsystem();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
 
@@ -121,7 +121,7 @@ public class RobotContainer
     //conveyor.setDefaultCommand(conveyor.clearCoral(coralHopper));
     // lights.setDefaultCommand(lights.set(Lights.Special.OFF));
     // climber.setDefaultCommand(climber.idle());
-    arm.setDefaultCommand(arm.armCmd(0.0));
+   // arm.setDefaultCommand(arm.armCmd(0.0));
 
     if (Robot.isSimulation())
     {
@@ -152,11 +152,11 @@ public class RobotContainer
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
-      driverXbox.povUp().whileTrue(arm.armCmd(1));
-      driverXbox.povDown().whileTrue(arm.armCmd(-1));
-      driverXbox.y().onTrue(arm.setAngle(Degrees.of(70)));
-      driverXbox.b().onTrue(arm.setAngle(Degrees.of(0)));
-      driverXbox.a().onTrue(arm.setAngle(Degrees.of(-40)));
+      // //driverXbox.povUp().whileTrue(arm.armCmd(1));
+      // //driverXbox.povDown().whileTrue(arm.armCmd(-1));
+      // driverXbox.y().onTrue(arm.setAngle(Degrees.of(70)));
+      // driverXbox.b().onTrue(arm.setAngle(Degrees.of(0)));
+      // driverXbox.a().onTrue(arm.setAngle(Degrees.of(-40)));
      // driverXbox.povUp().whileTrue(climber.ascend());
      // driverXbox.povDown().whileTrue(climber.descend());
      //driverXbox.y().onTrue(lights.set(Lights.Special.RAINBOW));
