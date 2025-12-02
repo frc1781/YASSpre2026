@@ -57,7 +57,7 @@ public class ArmSubsystem extends SubsystemBase
   private ArmFeedforward armFeedforward;
   private FeedForwardTuning armFeedForwardTuning;
 
-  private GenericEntry armDC;
+  private GenericEntry armVoltageSet;
   private ShuffleboardTab tab;
 
   private ArmConfig m_config;
@@ -68,9 +68,6 @@ public class ArmSubsystem extends SubsystemBase
     armMotor = new SparkMax(13, MotorType.kBrushless);
     armFeedforward = new ArmFeedforward(0.0, 1.14, 0, 0);
     armFeedForwardTuning = new FeedForwardTuning(getName(), armFeedforward.getKs(), armFeedforward.getKg(), armFeedforward.getKv(), armFeedforward.getKa());
-
-    tab = Shuffleboard.getTab(getName());
-    armDC = tab.add(getName() + " armDC", armDC).getEntry();
 
     motorConfig = new SmartMotorControllerConfig(this)
       .withClosedLoopController(0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
@@ -98,10 +95,13 @@ public class ArmSubsystem extends SubsystemBase
       .withHardLimit(Degrees.of(-90), Degrees.of(90))
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
       .withMass(Pounds.of(7))
-      .withStartingPosition(Degrees.of(-90))
+      .withStartingPosition(Degrees.of(90))
       // .withHorizontalZero(Degrees.of(205))
       .withMechanismPositionConfig(robotToMechanism);
     arm = new Arm(m_config);
+
+    tab = Shuffleboard.getTab(getName());
+    armVoltageSet = tab.add(getName() + " armVoltageSet",  arm.getMotor().getVoltage().in(Volts)).getEntry();
   }
 
   public void periodic()
@@ -109,6 +109,7 @@ public class ArmSubsystem extends SubsystemBase
     Logger.recordOutput("Arm/position", arm.getAngle());
     Logger.recordOutput("Arm/voltage", arm.getMotor().getVoltage());
     Logger.recordOutput("Arm/dutycycle", arm.getMotor().getDutyCycle());
+    arm.setVoltage(Volts.of(armVoltageSet.getDouble(0)));
 
     arm.getMotorController().setFeedforward(
       armFeedForwardTuning.getFeedForward()[0],
@@ -131,9 +132,10 @@ public class ArmSubsystem extends SubsystemBase
     return arm.set(dutycycle);
   }
 
-  public Command armDCFromNetworkTables() {
-    Logger.recordOutput("Arn.dc", armDC.getDouble(0));
-    return arm.set(armDC.getDouble(0));
+  public Command armVoltageFromNetworkTables() {
+    Logger.recordOutput("Arm/voltage", armVoltageSet.getDouble(0));
+    System.out.println("im running");
+    return arm.setVoltage(Volts.of(armVoltageSet.getDouble(0)));
   }
 
   public Command sysId()

@@ -141,7 +141,7 @@ public class RobotContainer
     else
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().whileTrue(arm.armDCFromNetworkTables());
+      driverXbox.x().whileTrue(arm.armVoltageFromNetworkTables().repeatedly());
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.povUp().whileTrue(arm.armCmd(0.35));
