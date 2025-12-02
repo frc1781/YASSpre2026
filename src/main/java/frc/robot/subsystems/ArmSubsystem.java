@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
@@ -57,7 +58,7 @@ public class ArmSubsystem extends SubsystemBase
   private ArmFeedforward armFeedforward;
   private FeedForwardTuning armFeedForwardTuning;
 
-  private GenericEntry armVoltageSet;
+  public GenericEntry armVoltageSet;
   private ShuffleboardTab tab;
 
   private ArmConfig m_config;
@@ -66,7 +67,7 @@ public class ArmSubsystem extends SubsystemBase
   public ArmSubsystem ()
   {
     armMotor = new SparkMax(13, MotorType.kBrushless);
-    armFeedforward = new ArmFeedforward(0.0, 1.14, 0, 0);
+    armFeedforward = new ArmFeedforward(0.0, 0.5, 0, 0);
     armFeedForwardTuning = new FeedForwardTuning(getName(), armFeedforward.getKs(), armFeedforward.getKg(), armFeedforward.getKv(), armFeedforward.getKa());
 
     motorConfig = new SmartMotorControllerConfig(this)
@@ -109,7 +110,7 @@ public class ArmSubsystem extends SubsystemBase
     Logger.recordOutput("Arm/position", arm.getAngle());
     Logger.recordOutput("Arm/voltage", arm.getMotor().getVoltage());
     Logger.recordOutput("Arm/dutycycle", arm.getMotor().getDutyCycle());
-    arm.setVoltage(Volts.of(armVoltageSet.getDouble(0)));
+    Logger.recordOutput("Arm/desiredvoltage", armVoltageSet.getDouble(0));
 
     arm.getMotorController().setFeedforward(
       armFeedForwardTuning.getFeedForward()[0],
@@ -126,16 +127,14 @@ public class ArmSubsystem extends SubsystemBase
     arm.simIterate();
   }
 
-  public Command armCmd(double dutycycle)
+  public Command armCmdVoltage(double voltage)
   {
-    Logger.recordOutput("Arm/dc", dutycycle);
-    return arm.set(dutycycle);
+    return arm.setVoltage(Volts.of(voltage));
   }
 
-  public Command armVoltageFromNetworkTables() {
-    Logger.recordOutput("Arm/voltage", armVoltageSet.getDouble(0));
-    System.out.println("im running");
-    return arm.setVoltage(Volts.of(armVoltageSet.getDouble(0)));
+  public Command armVoltageFromElastic()
+  {
+    return arm.setVoltage(() -> (Volts.of(armVoltageSet.getDouble(0) * Math.cos(arm.getAngle().in(Radians)))));
   }
 
   public Command sysId()

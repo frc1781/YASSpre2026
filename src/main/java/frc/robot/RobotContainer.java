@@ -121,7 +121,7 @@ public class RobotContainer
     //conveyor.setDefaultCommand(conveyor.clearCoral(coralHopper));
     // lights.setDefaultCommand(lights.set(Lights.Special.OFF));
     // climber.setDefaultCommand(climber.idle());
-    arm.setDefaultCommand(arm.armCmd(0.0));
+    arm.setDefaultCommand(arm.armCmdVoltage(0.0));
 
     if (Robot.isSimulation())
     {
@@ -131,21 +131,21 @@ public class RobotContainer
     if (DriverStation.isTest())
     {
       //drivebase.setDefaultCommand(driveFieldOrienteAnglularVelocity); // Overrides drive command above!d
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      // driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      // driverXbox.back().whileTrue(drivebase.centerModulesCommand());
+      // driverXbox.leftBumper().onTrue(Commands.none());
+      // driverXbox.rightBumper().onTrue(Commands.none());
     } 
     else
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().whileTrue(arm.armVoltageFromNetworkTables().repeatedly());
+      driverXbox.x().whileTrue(arm.armVoltageFromElastic());
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
-      driverXbox.povUp().whileTrue(arm.armCmd(0.35));
-      driverXbox.povDown().whileTrue(arm.armCmd(-0.35));
+      driverXbox.povUp().whileTrue(arm.armCmdVoltage(1));
+      driverXbox.povDown().whileTrue(arm.armCmdVoltage(-1));
       driverXbox.y().whileTrue(arm.setAngle(Degrees.of(70)));
       driverXbox.b().whileTrue(arm.setAngle(Degrees.of(0)));
       driverXbox.a().whileTrue(arm.setAngle(Degrees.of(-40)));
