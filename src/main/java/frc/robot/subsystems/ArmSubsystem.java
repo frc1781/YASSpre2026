@@ -68,12 +68,12 @@ public class ArmSubsystem extends SubsystemBase
 
   public ArmSubsystem ()
   {
-    armMotor = new SparkMax(13, MotorType.kBrushless);
-    armFeedforward = new ArmFeedforward(0.3, 0.5, 0.81, 0);
+    armMotor = new SparkMax(13, MotorType.kBrushless); 
+    armFeedforward = new ArmFeedforward(0.1, 0.5, 0.8,0.03);
     armFeedForwardTuning = new FeedForwardTuning(getName(), armFeedforward.getKs(), armFeedforward.getKg(), armFeedforward.getKv(), armFeedforward.getKa());
 
     motorConfig = new SmartMotorControllerConfig(this)
-      .withClosedLoopController(0, 0, 0, RadiansPerSecond.of(Math.PI/2), RadiansPerSecondPerSecond.of(Math.PI/2))
+      .withClosedLoopController(0.01, 0, 0, RadiansPerSecond.of(Math.PI/2), RadiansPerSecondPerSecond.of(Math.PI/2))
       .withSoftLimit(Radians.of(-Math.PI/2), Radians.of(Math.PI/2))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 1.889))) 
       // .withExternalEncoder(armMotor.getAbsoluteEncoder())
@@ -82,8 +82,8 @@ public class ArmSubsystem extends SubsystemBase
       .withStatorCurrentLimit(Amps.of(30))
       .withVoltageCompensation(Volts.of(12))
       .withMotorInverted(true)
-      .withClosedLoopRampRate(Seconds.of(0.25)) 
-      .withOpenLoopRampRate(Seconds.of(0.25))
+      .withClosedLoopRampRate(Seconds.of(2)) 
+      .withOpenLoopRampRate(Seconds.of(2))
       .withFeedforward(armFeedforward)
       .withControlMode(ControlMode.CLOSED_LOOP);
 
@@ -99,7 +99,6 @@ public class ArmSubsystem extends SubsystemBase
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
       .withMass(Pounds.of(7))
       .withStartingPosition(Degrees.of(90))
-      // .withHorizontalZero(Degrees.of(205))
       .withMechanismPositionConfig(robotToMechanism);
     arm = new Arm(m_config);
 
@@ -109,19 +108,20 @@ public class ArmSubsystem extends SubsystemBase
 
   public void periodic()
   {
-    Logger.recordOutput("Arm/position", arm.getAngle());
+    Logger.recordOutput("Arm/position", arm.getMotor().getMechanismPosition());
+    Logger.recordOutput("Arm/velocity", arm.getMotor().getMechanismVelocity());
     Logger.recordOutput("Arm/voltage", arm.getMotor().getVoltage());
     Logger.recordOutput("Arm/dutycycle", arm.getMotor().getDutyCycle());
     Logger.recordOutput("Arm/desiredvoltage", armVoltageSet.getDouble(0));
 
 
 
-    // arm.getMotorController().setFeedforward(
-    //   armFeedForwardTuning.getFeedForward()[0],
-    //   armFeedForwardTuning.getFeedForward()[1],
-    //   armFeedForwardTuning.getFeedForward()[2],
-    //   armFeedForwardTuning.getFeedForward()[3]
-    // );
+    arm.getMotorController().setFeedforward(
+      armFeedForwardTuning.getFeedForward()[0],
+      armFeedForwardTuning.getFeedForward()[1],
+      armFeedForwardTuning.getFeedForward()[2],
+      armFeedForwardTuning.getFeedForward()[3]
+    );
 
     arm.updateTelemetry();
   }
@@ -140,7 +140,7 @@ public class ArmSubsystem extends SubsystemBase
   {
     return arm.setVoltage(() -> (
       Volts.of((0.5 * Math.cos(arm.getAngle().in(Radians))) + armVoltageSet.getDouble(0))
-    )); //kS = 0.3,  kG = 0.5, kV = 1.208
+    )); //kS = 0.3,  kG = 0.5, kV = 0.8
   }
 
   public Command sysId()
