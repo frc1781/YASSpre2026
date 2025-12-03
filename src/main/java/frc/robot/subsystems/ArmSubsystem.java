@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
@@ -67,12 +69,12 @@ public class ArmSubsystem extends SubsystemBase
   public ArmSubsystem ()
   {
     armMotor = new SparkMax(13, MotorType.kBrushless);
-    armFeedforward = new ArmFeedforward(0.0, 0.5, 0, 0);
+    armFeedforward = new ArmFeedforward(0.3, 0.5, 0.81, 0);
     armFeedForwardTuning = new FeedForwardTuning(getName(), armFeedforward.getKs(), armFeedforward.getKg(), armFeedforward.getKv(), armFeedforward.getKa());
 
     motorConfig = new SmartMotorControllerConfig(this)
-      .withClosedLoopController(0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
-      .withSoftLimit(Degrees.of(-90), Degrees.of(90))
+      .withClosedLoopController(0, 0, 0, RadiansPerSecond.of(Math.PI/2), RadiansPerSecondPerSecond.of(Math.PI/2))
+      .withSoftLimit(Radians.of(-Math.PI/2), Radians.of(Math.PI/2))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 1.889))) 
       // .withExternalEncoder(armMotor.getAbsoluteEncoder())
       .withIdleMode(MotorMode.BRAKE)
@@ -112,12 +114,14 @@ public class ArmSubsystem extends SubsystemBase
     Logger.recordOutput("Arm/dutycycle", arm.getMotor().getDutyCycle());
     Logger.recordOutput("Arm/desiredvoltage", armVoltageSet.getDouble(0));
 
-    arm.getMotorController().setFeedforward(
-      armFeedForwardTuning.getFeedForward()[0],
-      armFeedForwardTuning.getFeedForward()[1],
-      armFeedForwardTuning.getFeedForward()[2],
-      armFeedForwardTuning.getFeedForward()[3]
-    );
+
+
+    // arm.getMotorController().setFeedforward(
+    //   armFeedForwardTuning.getFeedForward()[0],
+    //   armFeedForwardTuning.getFeedForward()[1],
+    //   armFeedForwardTuning.getFeedForward()[2],
+    //   armFeedForwardTuning.getFeedForward()[3]
+    // );
 
     arm.updateTelemetry();
   }
@@ -134,7 +138,9 @@ public class ArmSubsystem extends SubsystemBase
 
   public Command armVoltageFromElastic()
   {
-    return arm.setVoltage(() -> (Volts.of(armVoltageSet.getDouble(0) * Math.cos(arm.getAngle().in(Radians)))));
+    return arm.setVoltage(() -> (
+      Volts.of((0.5 * Math.cos(arm.getAngle().in(Radians))) + armVoltageSet.getDouble(0))
+    )); //kS = 0.3,  kG = 0.5, kV = 1.208
   }
 
   public Command sysId()
