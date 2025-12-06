@@ -39,21 +39,23 @@ import yams.motorcontrollers.local.SparkWrapper;
 public class ArmSubsystem extends SubsystemBase
 {
 
-  private final SparkMax armMotor = new SparkMax(13, MotorType.kBrushless);
-  //  private final SmartMotorControllerTelemetryConfig motorTelemetryConfig = new SmartMotorControllerTelemetryConfig()
-//          .withMechanismPosition()
-//          .withRotorPosition()
-//          .withMechanismLowerLimit()
-//          .withMechanismUpperLimit();
+  private final SparkMax rightMotor = new SparkMax( 41, MotorType.kBrushless);
+  private final SparkMax leftMotor = new SparkMax(40, MotorType.kBrushless);
+  
+    private final SmartMotorControllerTelemetryConfig motorTelemetryConfig = new SmartMotorControllerTelemetryConfig()
+          .withMechanismPosition()
+          .withRotorPosition()
+          .withMechanismLowerLimit()
+          .withMechanismUpperLimit();
 
   private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
       .withClosedLoopController(0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
       .withSoftLimit(Degrees.of(0), Degrees.of(80))
-      .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
+      .withGearing(new MechanismGearing(GearBox.fromReductionStages(5,5,5,(58/24))))
       .withExternalEncoder(armMotor.getAbsoluteEncoder())
-      .withZeroOffset(Rotations.of(0.315))
+      .withZeroOffset(Rotations.of(0))
       .withIdleMode(MotorMode.BRAKE)
-      .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
+      .withTelemetry("leftMotor", TelemetryVerbosity.HIGH)
 //      .withSpecificTelemetry("ArmMotor", motorTelemetryConfig)
       .withStatorCurrentLimit(Amps.of(30))
       .withVoltageCompensation(Volts.of(12))
