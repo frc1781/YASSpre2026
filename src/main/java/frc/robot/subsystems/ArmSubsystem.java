@@ -16,7 +16,11 @@ import static yams.mechanisms.SmartMechanism.gearing;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -52,9 +56,9 @@ public class ArmSubsystem extends SubsystemBase
       .withClosedLoopController(0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
       .withSoftLimit(Degrees.of(0), Degrees.of(80))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(5,5,5,(58/24))))
-      .withExternalEncoder(leftMotor.getAbsoluteEncoder())
+      //.withExternalEncoder(leftMotor.getAbsoluteEncoder())
       .withZeroOffset(Rotations.of(0))
-      .withIdleMode(MotorMode.BRAKE)
+      .withIdleMode(MotorMode.COAST)
       .withTelemetry("leftMotor", TelemetryVerbosity.HIGH)
 //      .withSpecificTelemetry("leftMotor", motorTelemetryConfig)
       .withStatorCurrentLimit(Amps.of(30))
@@ -85,7 +89,11 @@ public class ArmSubsystem extends SubsystemBase
 
   public ArmSubsystem ()
   {
+        SparkMaxConfig armMotorConfig = new SparkMaxConfig();
+        armMotorConfig.idleMode(SparkMaxConfig.IdleMode.kCoast);
+        armMotorConfig.follow(40);
 
+     rightMotor.configure(armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void periodic()
