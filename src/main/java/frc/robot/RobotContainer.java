@@ -155,8 +155,8 @@ public class RobotContainer
       driverXbox.povUp().whileTrue(arm.armCmd(1));
       driverXbox.povDown().whileTrue(arm.armCmd(-1));
       driverXbox.y().onTrue(arm.setAngle(Degrees.of(70)));
-      driverXbox.b().onTrue(arm.setAngle(Degrees.of(0)));
-      driverXbox.a().onTrue(arm.setAngle(Degrees.of(-40)));
+      driverXbox.b().onTrue(arm.setAngle(Degrees.of(40)));
+      driverXbox.a().onTrue(arm.setAngle(Degrees.of(10)));
      // driverXbox.povUp().whileTrue(climber.ascend());
      // driverXbox.povDown().whileTrue(climber.descend());
      //driverXbox.y().onTrue(lights.set(Lights.Special.RAINBOW));
