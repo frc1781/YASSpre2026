@@ -21,6 +21,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -57,7 +58,7 @@ public class ArmSubsystem extends SubsystemBase
       .withSoftLimit(Degrees.of(0), Degrees.of(80))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(5,5,5,(58/24))))
       //.withExternalEncoder(leftMotor.getAbsoluteEncoder())
-      .withZeroOffset(Rotations.of(0))
+     // .withZeroOffset(Rotations.of(0))
       .withIdleMode(MotorMode.COAST)
       .withTelemetry("leftMotor", TelemetryVerbosity.HIGH)
 //      .withSpecificTelemetry("leftMotor", motorTelemetryConfig)
