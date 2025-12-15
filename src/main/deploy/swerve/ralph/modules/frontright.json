@@ -1,11 +1,20 @@
 {
+  "location": {
+    "front": 11.5,
+    "left": -12.5
+  },
+  "absoluteEncoderOffset": 300,
   "drive": {
-    "type": "talonfx",
+    "type": "krakenx60",
     "id": 26,
     "canbus": null
   },
+  "inverted": {
+    "drive": false,
+    "angle": true
+  },
   "angle": {
-    "type": "sparkmax",
+    "type": "sparkmax_neo",
     "id": 25,
     "canbus": null
   },
@@ -14,6 +23,7 @@
     "id": 62,
     "canbus": null
   },
+<<<<<<< HEAD
   "inverted": {
     "drive": false,
     "angle": true
@@ -24,3 +34,7 @@
     "left": -11.375
   }
 }
+=======
+  "absoluteEncoderInverted": false
+}
+>>>>>>> 0750d7bd19198f73f343aa3e533f1c7b13cf7a9f
