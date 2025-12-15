@@ -102,10 +102,11 @@ public class ArmSubsystem extends SubsystemBase
         SparkMaxConfig armMotorConfig = new SparkMaxConfig();
         armMotorConfig.idleMode(SparkMaxConfig.IdleMode.kCoast);
         armMotorConfig.follow(40);
+        armMotorConfig.inverted(true);
+        rightMotor.configure(armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
         tab = Shuffleboard.getTab(getName());
         armVoltageSet = tab.add(getName() + " armVoltageSet",  arm.getMotor().getVoltage().in(Volts)).getEntry();
-      
-     rightMotor.configure(armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void periodic()
