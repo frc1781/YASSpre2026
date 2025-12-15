@@ -23,18 +23,5 @@
     "id": 61,
     "canbus": null
   },
-<<<<<<< HEAD
-  "inverted": {
-    "drive": false,
-    "angle": true
-  },
-  "absoluteEncoderOffset": 244.0,
-  "location": {
-    "front": -13,
-    "left": 11.375
-  }
-}
-=======
   "absoluteEncoderInverted": false
 }
->>>>>>> 0750d7bd19198f73f343aa3e533f1c7b13cf7a9f
