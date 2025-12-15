@@ -125,8 +125,9 @@ public class ArmSubsystem extends SubsystemBase
 
   public Command armVoltageFromElastic()
   {
-    return arm.setVoltage(() -> (Volts.of(armVoltageSet.getDouble(0) * Math.cos(arm.getAngle().in(Radians)))));
-  }
+    //return arm.setVoltage(() -> (Volts.of(armVoltageSet.getDouble(0) * Math.cos(arm.getAngle().in(Radians)))));
+     return arm.setVoltage(() -> (Volts.of(0.5 * Math.cos(arm.getAngle().in(Radians))) * Volts.of(armVoltageSet.getDouble(0))));
+}
 
   
 
