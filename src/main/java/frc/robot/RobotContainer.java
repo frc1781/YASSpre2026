@@ -115,48 +115,40 @@ public class RobotContainer
     } 
     else
     {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+      // drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
     }
 
     //conveyor.setDefaultCommand(conveyor.clearCoral(coralHopper));
     // lights.setDefaultCommand(lights.set(Lights.Special.OFF));
     // climber.setDefaultCommand(climber.idle());
-    arm.setDefaultCommand(arm.armCmd(0.0));
+    arm.setDefaultCommand(arm.armCmdVoltage(0.0));
 
     if (Robot.isSimulation())
     {
-      Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
-      driveDirectAngleKeyboard.driveToPose(
-        () -> target, 
-        new ProfiledPIDController(5, 0,0, new Constraints(5, 2)),
-        new ProfiledPIDController(5,0,0, new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(180))));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-      driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
-                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
+      
     }
 
     if (DriverStation.isTest())
     {
       //drivebase.setDefaultCommand(driveFieldOrienteAnglularVelocity); // Overrides drive command above!d
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      // driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      // driverXbox.back().whileTrue(drivebase.centerModulesCommand());
+      // driverXbox.leftBumper().onTrue(Commands.none());
+      // driverXbox.rightBumper().onTrue(Commands.none());
     } 
     else
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      driverXbox.x().whileTrue(arm.armVoltageFromElastic());
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
-      driverXbox.povUp().whileTrue(arm.armCmd(1));
-      driverXbox.povDown().whileTrue(arm.armCmd(-1));
-      driverXbox.y().onTrue(arm.setAngle(Degrees.of(50)));
-      driverXbox.b().onTrue(arm.setAngle(Degrees.of(20)));
-      driverXbox.a().onTrue(arm.setAngle(Degrees.of(-10)));
+      driverXbox.povUp().whileTrue(arm.armCmdVoltage(1));
+      driverXbox.povDown().whileTrue(arm.armCmdVoltage(-1));
+      driverXbox.y().whileTrue(arm.setAngle(Degrees.of(70)));
+      driverXbox.b().whileTrue(arm.setAngle(Degrees.of(0)));
+      driverXbox.a().whileTrue(arm.setAngle(Degrees.of(-40)));
      // driverXbox.povUp().whileTrue(climber.ascend());
      // driverXbox.povDown().whileTrue(climber.descend());
      //driverXbox.y().onTrue(lights.set(Lights.Special.RAINBOW));
