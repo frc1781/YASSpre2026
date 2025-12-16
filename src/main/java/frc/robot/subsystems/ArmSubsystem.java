@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Rotations;
@@ -46,8 +47,7 @@ import yams.motorcontrollers.local.SparkWrapper;
 public class ArmSubsystem extends SubsystemBase
 {
  public GenericEntry armVoltageSet;
-  private final SparkMax rightMotor = new SparkMax( 41, MotorType.kBrushless);
-  private final SparkMax leftMotor = new SparkMax(40, MotorType.kBrushless);
+  private final SparkMax armMotor = new SparkMax(11, MotorType.kBrushless);
   private ShuffleboardTab tab;
     // private final SmartMotorControllerTelemetryConfig motorTelemetryConfig = new SmartMotorControllerTelemetryConfig()
     //       .withMechanismPosition()
@@ -56,25 +56,25 @@ public class ArmSubsystem extends SubsystemBase
     //       .withMechanismUpperLimit();
 
   private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
-      .withClosedLoopController(0.04, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
-      .withSoftLimit(Degrees.of(10), Degrees.of(80))
+      .withClosedLoopController(0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
+      .withSoftLimit(Degrees.of(0), Degrees.of(80))
       .withGearing(new MechanismGearing(
-        GearBox.fromReductionStages(5,5,5), Sprocket.fromStages("24:52")))
+        GearBox.fromReductionStages(5,5,4), Sprocket.fromStages("22:60")))
       //.withExternalEncoder(leftMotor.getAbsoluteEncoder())
      // .withZeroOffset(Rotations.of(0))
       .withIdleMode(MotorMode.COAST)
-      .withTelemetry("leftMotor", TelemetryVerbosity.HIGH)
-//      .withSpecificTelemetry("leftMotor", motorTelemetryConfig)
-      .withStatorCurrentLimit(Amps.of(40))
+      .withTelemetry("armMotor", TelemetryVerbosity.HIGH)
+//      .withSpecificTelemetry("armMotor", motorTelemetryConfig)
+      .withStatorCurrentLimit(Amps.of(30))
       .withVoltageCompensation(Volts.of(12))
-      .withMotorInverted(false)
+      .withMotorInverted(true)
       .withClosedLoopRampRate(Seconds.of(0.25))
       .withOpenLoopRampRate(Seconds.of(0.25))
       .withFeedforward(new ArmFeedforward(0.0, 0.08, 0, 0))
       .withControlMode(ControlMode.CLOSED_LOOP);
 
 
-  private final SmartMotorController motor = new SparkWrapper(leftMotor, DCMotor.getNEO(1), motorConfig);
+  private final SmartMotorController motor = new SparkWrapper(armMotor, DCMotor.getNEO(1), motorConfig);
   private final MechanismPositionConfig robotToMechanism = new MechanismPositionConfig()
       .withMaxRobotHeight(Meters.of(1.5))
       .withMaxRobotLength(Meters.of(0.75))
@@ -82,8 +82,8 @@ public class ArmSubsystem extends SubsystemBase
 
 
   private ArmConfig m_config = new ArmConfig(motor)
-      .withLength(Meters.of(0.135))
-      .withHardLimit(Degrees.of(0), Degrees.of(90))
+      .withLength(Inches.of(39.5))
+      .withHardLimit(Degrees.of(0), Degrees.of(80))
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
       .withMass(Pounds.of(1))
       .withStartingPosition(Degrees.of(0))
@@ -96,8 +96,6 @@ public class ArmSubsystem extends SubsystemBase
   {
         SparkMaxConfig armMotorConfig = new SparkMaxConfig();
         armMotorConfig.idleMode(SparkMaxConfig.IdleMode.kCoast);
-        armMotorConfig.follow(40,true);
-        rightMotor.configure(armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         tab = Shuffleboard.getTab(getName());
         armVoltageSet = tab.add(getName() + " armVoltageSet",  arm.getMotor().getVoltage().in(Volts)).getEntry();
