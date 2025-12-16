@@ -16,16 +16,23 @@ import static yams.mechanisms.SmartMechanism.gearing;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
+import yams.gearing.Sprocket;
 import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.config.MechanismPositionConfig;
 import yams.mechanisms.positional.Arm;
@@ -38,24 +45,27 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 public class ArmSubsystem extends SubsystemBase
 {
-
-  private final SparkMax armMotor = new SparkMax(13, MotorType.kBrushless);
-  //  private final SmartMotorControllerTelemetryConfig motorTelemetryConfig = new SmartMotorControllerTelemetryConfig()
-//          .withMechanismPosition()
-//          .withRotorPosition()
-//          .withMechanismLowerLimit()
-//          .withMechanismUpperLimit();
+ public GenericEntry armVoltageSet;
+  private final SparkMax rightMotor = new SparkMax( 41, MotorType.kBrushless);
+  private final SparkMax leftMotor = new SparkMax(40, MotorType.kBrushless);
+  private ShuffleboardTab tab;
+    // private final SmartMotorControllerTelemetryConfig motorTelemetryConfig = new SmartMotorControllerTelemetryConfig()
+    //       .withMechanismPosition()
+    //      .withRotorPosition()
+    //      .withMechanismLowerLimit()
+    //       .withMechanismUpperLimit();
 
   private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
-      .withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
-      .withSoftLimit(Degrees.of(-75), Degrees.of(90))
-      .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
-      .withExternalEncoder(armMotor.getAbsoluteEncoder())
-      .withZeroOffset(Rotations.of(0.315))
-      .withIdleMode(MotorMode.BRAKE)
-      .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-//      .withSpecificTelemetry("ArmMotor", motorTelemetryConfig)
-      .withStatorCurrentLimit(Amps.of(30))
+      .withClosedLoopController(0.04, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
+      .withSoftLimit(Degrees.of(10), Degrees.of(80))
+      .withGearing(new MechanismGearing(
+        GearBox.fromReductionStages(5,5,5), Sprocket.fromStages("24:52")))
+      //.withExternalEncoder(leftMotor.getAbsoluteEncoder())
+     // .withZeroOffset(Rotations.of(0))
+      .withIdleMode(MotorMode.COAST)
+      .withTelemetry("leftMotor", TelemetryVerbosity.HIGH)
+//      .withSpecificTelemetry("leftMotor", motorTelemetryConfig)
+      .withStatorCurrentLimit(Amps.of(40))
       .withVoltageCompensation(Volts.of(12))
       .withMotorInverted(false)
       .withClosedLoopRampRate(Seconds.of(0.25))
@@ -64,7 +74,7 @@ public class ArmSubsystem extends SubsystemBase
       .withControlMode(ControlMode.CLOSED_LOOP);
 
 
-  private final SmartMotorController motor = new SparkWrapper(armMotor, DCMotor.getNEO(1), motorConfig);
+  private final SmartMotorController motor = new SparkWrapper(leftMotor, DCMotor.getNEO(1), motorConfig);
   private final MechanismPositionConfig robotToMechanism = new MechanismPositionConfig()
       .withMaxRobotHeight(Meters.of(1.5))
       .withMaxRobotLength(Meters.of(0.75))
@@ -73,17 +83,24 @@ public class ArmSubsystem extends SubsystemBase
 
   private ArmConfig m_config = new ArmConfig(motor)
       .withLength(Meters.of(0.135))
-      .withHardLimit(Degrees.of(-90), Degrees.of(90))
+      .withHardLimit(Degrees.of(0), Degrees.of(90))
       .withTelemetry("Arm", TelemetryVerbosity.HIGH)
       .withMass(Pounds.of(1))
-      .withStartingPosition(Degrees.of(80))
-      .withHorizontalZero(Degrees.of(0))
+      .withStartingPosition(Degrees.of(0))
+      //.withHorizontalZero(Degrees.of(0))
       .withMechanismPositionConfig(robotToMechanism);
   private final Arm arm = new Arm(m_config);
+  
 
   public ArmSubsystem ()
   {
+        SparkMaxConfig armMotorConfig = new SparkMaxConfig();
+        armMotorConfig.idleMode(SparkMaxConfig.IdleMode.kCoast);
+        armMotorConfig.follow(40,true);
+        rightMotor.configure(armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        tab = Shuffleboard.getTab(getName());
+        armVoltageSet = tab.add(getName() + " armVoltageSet",  arm.getMotor().getVoltage().in(Volts)).getEntry();
   }
 
   public void periodic()
