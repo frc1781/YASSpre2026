@@ -23,6 +23,9 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import CRA.FeedForwardTuning;
+
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -57,48 +60,24 @@ public class ArmSubsystem extends SubsystemBase
   private final SparkMax rightMotor = new SparkMax( 41, MotorType.kBrushless);
   private final SparkMax leftMotor = new SparkMax(40, MotorType.kBrushless);
   private ShuffleboardTab tab;
+
+  private final SmartMotorControllerConfig motorConfig;
+
+
+private final SmartMotorController motor;
+private final MechanismPositionConfig robotToMechanism;
+
+
+private ArmConfig m_config;
+private final Arm arm;
+
     // private final SmartMotorControllerTelemetryConfig motorTelemetryConfig = new SmartMotorControllerTelemetryConfig()
     //       .withMechanismPosition()
     //      .withRotorPosition()
     //      .withMechanismLowerLimit()
     //       .withMechanismUpperLimit();
 
-  private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
-      .withClosedLoopController(0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
-      .withSoftLimit(Degrees.of(0), Degrees.of(80))
-      .withGearing(new MechanismGearing(
-        GearBox.fromReductionStages(5,5,5), Sprocket.fromStages("24:52")))
-      //.withExternalEncoder(leftMotor.getAbsoluteEncoder())
-     // .withZeroOffset(Rotations.of(0))
-      .withIdleMode(MotorMode.COAST)
-      .withTelemetry("leftMotor", TelemetryVerbosity.HIGH)
-//      .withSpecificTelemetry("leftMotor", motorTelemetryConfig)
-      .withStatorCurrentLimit(Amps.of(30))
-      .withVoltageCompensation(Volts.of(12))
-      .withMotorInverted(false)
-      //.withClosedLoopRampRate(Seconds.of(0.25))
-      //.withOpenLoopRampRate(Seconds.of(0.25))                             turn ramp rate back on after test
-      .withFeedforward(new ArmFeedforward(0.0, 0.5, 5.6, 1.4))
-      .withControlMode(ControlMode.CLOSED_LOOP);
-
-
-  private final SmartMotorController motor = new SparkWrapper(leftMotor, DCMotor.getNEO(1), motorConfig);
-  private final MechanismPositionConfig robotToMechanism = new MechanismPositionConfig()
-      .withMaxRobotHeight(Meters.of(1.5))
-      .withMaxRobotLength(Meters.of(0.75))
-      .withRelativePosition(new Translation3d(Meters.of(0), Meters.of(0), Meters.of(0.5)));
-
-
-  private ArmConfig m_config = new ArmConfig(motor)
-      .withLength(Meters.of(0.135))
-      .withHardLimit(Degrees.of(0), Degrees.of(90))
-      .withTelemetry("Arm", TelemetryVerbosity.HIGH)
-      .withMass(Pounds.of(1))
-      .withStartingPosition(Degrees.of(0))
-      //.withHorizontalZero(Degrees.of(0))
-      .withMechanismPositionConfig(robotToMechanism);
-  private final Arm arm = new Arm(m_config);
-  
+ 
 
   public ArmSubsystem ()
   {
@@ -106,11 +85,44 @@ public class ArmSubsystem extends SubsystemBase
         armMotorConfig.idleMode(SparkMaxConfig.IdleMode.kCoast);
         armMotorConfig.follow(40,true);
         rightMotor.configure(armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
         tab = Shuffleboard.getTab(getName());
-        armVoltageSet = tab.add(getName() + "armVoltageSet",  arm.getMotor().getVoltage().in(Volts)).getEntry();
-        armFeedforward = new ArmFeedforward(0.1, 0.5, 0.8, 0.03);
+        armFeedforward = new ArmFeedforward(0.1, 0.5, 5.6, 1.4);
         armFeedForwardTuning = new FeedForwardTuning(getName(), armFeedforward.getKs(), armFeedforward.getKg(), armFeedforward.getKv(), armFeedforward.getKa());
+
+        motorConfig = new SmartMotorControllerConfig(this)
+        .withClosedLoopController(0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
+        .withSoftLimit(Degrees.of(0), Degrees.of(80))
+        .withGearing(new MechanismGearing(
+          GearBox.fromReductionStages(5,5,5), Sprocket.fromStages("24:52")))
+        //.withExternalEncoder(leftMotor.getAbsoluteEncoder())
+       // .withZeroOffset(Rotations.of(0))
+        .withIdleMode(MotorMode.COAST)
+        .withTelemetry("leftMotor", TelemetryVerbosity.HIGH)
+  //      .withSpecificTelemetry("leftMotor", motorTelemetryConfig)
+        .withStatorCurrentLimit(Amps.of(30))
+        .withVoltageCompensation(Volts.of(12))
+        .withMotorInverted(false)
+        //.withClosedLoopRampRate(Seconds.of(0.25))
+        //.withOpenLoopRampRate(Seconds.of(0.25))                             turn ramp rate back on after test
+        .withFeedforward(armFeedforward)
+        .withControlMode(ControlMode.CLOSED_LOOP);
+        motor = new SparkWrapper(leftMotor, DCMotor.getNEO(1), motorConfig);
+        robotToMechanism = new MechanismPositionConfig()
+        .withMaxRobotHeight(Meters.of(1.5))
+        .withMaxRobotLength(Meters.of(0.75))
+        .withRelativePosition(new Translation3d(Meters.of(0), Meters.of(0), Meters.of(0.5)));
+        
+        m_config = new ArmConfig(motor)
+        .withLength(Meters.of(0.135))
+        .withHardLimit(Degrees.of(0), Degrees.of(90))
+        .withTelemetry("Arm", TelemetryVerbosity.HIGH)
+        .withMass(Pounds.of(1))
+        .withStartingPosition(Degrees.of(0))
+        //.withHorizontalZero(Degrees.of(0))
+        .withMechanismPositionConfig(robotToMechanism);
+        arm = new Arm(m_config);
+
+        armVoltageSet = tab.add(getName() + "armVoltageSet",  arm.getMotor().getVoltage().in(Volts)).getEntry();
   }
 
   public void periodic()
@@ -147,7 +159,12 @@ public class ArmSubsystem extends SubsystemBase
       armFeedForwardTuning.getFeedForward()[1],
       armFeedForwardTuning.getFeedForward()[2],
       armFeedForwardTuning.getFeedForward()[3]
-    ));
+    )).andThen(() -> {
+      System.out.println(armFeedForwardTuning.getFeedForward()[0]);
+      System.out.println(armFeedForwardTuning.getFeedForward()[1]);
+      System.out.println(armFeedForwardTuning.getFeedForward()[2]);
+      System.out.println(armFeedForwardTuning.getFeedForward()[3]);
+    });
   }
 
   public Command armCmd(double dutycycle)
