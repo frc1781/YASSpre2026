@@ -30,6 +30,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,7 +51,7 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 public class ArmSubsystem extends SubsystemBase
 {
- public GenericEntry armVoltageSet;
+  public GenericEntry armVoltageSet;
   private final SparkMax rightMotor = new SparkMax( 41, MotorType.kBrushless);
   private final SparkMax leftMotor = new SparkMax(40, MotorType.kBrushless);
   private ShuffleboardTab tab;
@@ -73,9 +74,9 @@ public class ArmSubsystem extends SubsystemBase
       .withStatorCurrentLimit(Amps.of(30))
       .withVoltageCompensation(Volts.of(12))
       .withMotorInverted(false)
-      .withClosedLoopRampRate(Seconds.of(0.25))
-      .withOpenLoopRampRate(Seconds.of(0.25))
-      .withFeedforward(new ArmFeedforward(0.0, 0.08, 0, 0))
+      //.withClosedLoopRampRate(Seconds.of(0.25))
+      //.withOpenLoopRampRate(Seconds.of(0.25))                             turn ramp rate back on after test
+      .withFeedforward(new ArmFeedforward(0.0, 0.5, 5.6, 1.4))
       .withControlMode(ControlMode.CLOSED_LOOP);
 
 
@@ -105,12 +106,15 @@ public class ArmSubsystem extends SubsystemBase
         rightMotor.configure(armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         tab = Shuffleboard.getTab(getName());
-        armVoltageSet = tab.add(getName() + " armVoltageSet",  arm.getMotor().getVoltage().in(Volts)).getEntry();
+        armVoltageSet = tab.add(getName() + "armVoltageSet",  arm.getMotor().getVoltage().in(Volts)).getEntry();
   }
 
   public void periodic()
   {
-    Logger.recordOutput("Arm/position", arm.getAngle());
+    Logger.recordOutput("Arm/position", arm.getMotor().getMechanismPosition());
+    Logger.recordOutput("Arm/velocity", arm.getMotor().getMechanismVelocity());
+    Logger.recordOutput("Arm/volts", arm.getMotor().getVoltage());
+    Logger.recordOutput("Arm/desiredvoltage", armVoltageSet.getDouble(0));
     arm.updateTelemetry();
   }
 
@@ -125,11 +129,10 @@ public class ArmSubsystem extends SubsystemBase
 
   public Command armVoltageFromElastic()
   {
-    //return arm.setVoltage(() -> (Volts.of(armVoltageSet.getDouble(0) * Math.cos(arm.getAngle().in(Radians)))));
-     return arm.setVoltage(() -> (Volts.of(0.5 * Math.cos(arm.getAngle().in(Radians))) * Volts.of(armVoltageSet.getDouble(0))));
-}
-
-  
+    return arm.setVoltage(() -> (
+      Volts.of(0.5 * Math.cos(arm.getAngle().in(Radians)) + armVoltageSet.getDouble(0))
+    ));
+  }
 
   public Command armCmd(double dutycycle)
   {
