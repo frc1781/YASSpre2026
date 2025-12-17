@@ -141,14 +141,15 @@ public class RobotContainer
     else
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().whileTrue(arm.armVoltageFromElastic());
+      driverXbox.x().onTrue(arm.armVoltageFromElastic());
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.povUp().whileTrue(arm.armCmdVoltage(1));
       driverXbox.povDown().whileTrue(arm.armCmdVoltage(-1));
-      driverXbox.y().whileTrue(arm.setAngle(Degrees.of(70)));
+      driverXbox.povLeft().whileTrue(arm.armFeedForwardsFromElastic());
+      driverXbox.y().whileTrue(arm.setAngle(Degrees.of(60)));
       driverXbox.b().whileTrue(arm.setAngle(Degrees.of(0)));
-      driverXbox.a().whileTrue(arm.setAngle(Degrees.of(-40)));
+      driverXbox.a().whileTrue(arm.setAngle(Degrees.of(-45)));
      // driverXbox.povUp().whileTrue(climber.ascend());
      // driverXbox.povDown().whileTrue(climber.descend());
      //driverXbox.y().onTrue(lights.set(Lights.Special.RAINBOW));

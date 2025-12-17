@@ -69,21 +69,20 @@ public class ArmSubsystem extends SubsystemBase
   public ArmSubsystem ()
   {
     armMotor = new SparkMax(13, MotorType.kBrushless); 
-    armFeedforward = new ArmFeedforward(0.1, 0.5, 0.8,0.03);
+    armFeedforward = new ArmFeedforward(0.1, 0.5, 0.8, 0.03);
     armFeedForwardTuning = new FeedForwardTuning(getName(), armFeedforward.getKs(), armFeedforward.getKg(), armFeedforward.getKv(), armFeedforward.getKa());
 
     motorConfig = new SmartMotorControllerConfig(this)
       .withClosedLoopController(0.01, 0, 0, RadiansPerSecond.of(Math.PI/2), RadiansPerSecondPerSecond.of(Math.PI/2))
       .withSoftLimit(Radians.of(-Math.PI/2), Radians.of(Math.PI/2))
-      .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 1.889))) 
-      // .withExternalEncoder(armMotor.getAbsoluteEncoder())
+      .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 1.889)))
       .withIdleMode(MotorMode.BRAKE)
       .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
       .withStatorCurrentLimit(Amps.of(30))
       .withVoltageCompensation(Volts.of(12))
       .withMotorInverted(true)
-      .withClosedLoopRampRate(Seconds.of(2)) 
-      .withOpenLoopRampRate(Seconds.of(2))
+      .withClosedLoopRampRate(Seconds.of(1)) 
+      .withOpenLoopRampRate(Seconds.of(1))
       .withFeedforward(armFeedforward)
       .withControlMode(ControlMode.CLOSED_LOOP);
 
@@ -114,15 +113,6 @@ public class ArmSubsystem extends SubsystemBase
     Logger.recordOutput("Arm/dutycycle", arm.getMotor().getDutyCycle());
     Logger.recordOutput("Arm/desiredvoltage", armVoltageSet.getDouble(0));
 
-
-
-    arm.getMotorController().setFeedforward(
-      armFeedForwardTuning.getFeedForward()[0],
-      armFeedForwardTuning.getFeedForward()[1],
-      armFeedForwardTuning.getFeedForward()[2],
-      armFeedForwardTuning.getFeedForward()[3]
-    );
-
     arm.updateTelemetry();
   }
 
@@ -141,6 +131,17 @@ public class ArmSubsystem extends SubsystemBase
     return arm.setVoltage(() -> (
       Volts.of((0.5 * Math.cos(arm.getAngle().in(Radians))) + armVoltageSet.getDouble(0))
     )); //kS = 0.3,  kG = 0.5, kV = 0.8
+  }
+
+  public Command armFeedForwardsFromElastic() 
+  {
+    return this.runOnce(() -> 
+    arm.getMotorController().setFeedforward(
+      armFeedForwardTuning.getFeedForward()[0],
+      armFeedForwardTuning.getFeedForward()[1],
+      armFeedForwardTuning.getFeedForward()[2],
+      armFeedForwardTuning.getFeedForward()[3]
+    ));
   }
 
   public Command sysId()
