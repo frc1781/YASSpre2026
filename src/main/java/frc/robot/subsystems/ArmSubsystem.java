@@ -52,6 +52,8 @@ import yams.motorcontrollers.local.SparkWrapper;
 public class ArmSubsystem extends SubsystemBase
 {
   public GenericEntry armVoltageSet;
+  private ArmFeedforward armFeedforward;
+  private FeedForwardTuning armFeedForwardTuning;
   private final SparkMax rightMotor = new SparkMax( 41, MotorType.kBrushless);
   private final SparkMax leftMotor = new SparkMax(40, MotorType.kBrushless);
   private ShuffleboardTab tab;
@@ -107,6 +109,8 @@ public class ArmSubsystem extends SubsystemBase
 
         tab = Shuffleboard.getTab(getName());
         armVoltageSet = tab.add(getName() + "armVoltageSet",  arm.getMotor().getVoltage().in(Volts)).getEntry();
+        armFeedforward = new ArmFeedforward(0.1, 0.5, 0.8, 0.03);
+        armFeedForwardTuning = new FeedForwardTuning(getName(), armFeedforward.getKs(), armFeedforward.getKg(), armFeedforward.getKv(), armFeedforward.getKa());
   }
 
   public void periodic()
@@ -131,6 +135,18 @@ public class ArmSubsystem extends SubsystemBase
   {
     return arm.setVoltage(() -> (
       Volts.of(0.5 * Math.cos(arm.getAngle().in(Radians)) + armVoltageSet.getDouble(0))
+    ));
+  }
+
+
+  public Command armFeedForwardsFromElastic() 
+  {
+    return this.runOnce(() -> 
+    arm.getMotorController().setFeedforward(
+      armFeedForwardTuning.getFeedForward()[0],
+      armFeedForwardTuning.getFeedForward()[1],
+      armFeedForwardTuning.getFeedForward()[2],
+      armFeedForwardTuning.getFeedForward()[3]
     ));
   }
 
