@@ -23,9 +23,11 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import CRA.FeedForwardTuning;
+import CRA.PIDTuning;
 
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.EntryBase;
@@ -59,6 +61,8 @@ public class ArmSubsystem extends SubsystemBase
 
   private ArmFeedforward armFeedforward;
   private FeedForwardTuning armFeedForwardTuning;
+  private PIDController armPID;
+  private PIDTuning armPIDtuning;
 
   public GenericEntry armVoltageSet;
   private ShuffleboardTab tab;
@@ -71,9 +75,12 @@ public class ArmSubsystem extends SubsystemBase
     armMotor = new SparkMax(13, MotorType.kBrushless); 
     armFeedforward = new ArmFeedforward(0.1, 0.5, 0.8, 0.03);
     armFeedForwardTuning = new FeedForwardTuning(getName(), armFeedforward.getKs(), armFeedforward.getKg(), armFeedforward.getKv(), armFeedforward.getKa());
+    armPID = new PIDController(0.02, 0, 0);
+    armPIDtuning = new PIDTuning(getName(), armPID.getP(), armPID.getI(), armPID.getD(), 0);
+    
 
     motorConfig = new SmartMotorControllerConfig(this)
-      .withClosedLoopController(0.01, 0, 0, RadiansPerSecond.of(Math.PI/2), RadiansPerSecondPerSecond.of(Math.PI/2))
+      .withClosedLoopController(armPID.getP(), armPID.getI(), armPID.getD(), RadiansPerSecond.of(Math.PI/2), RadiansPerSecondPerSecond.of(Math.PI/2))
       .withSoftLimit(Radians.of(-Math.PI/2), Radians.of(Math.PI/2))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 5, 1.889)))
       .withIdleMode(MotorMode.BRAKE)
@@ -133,15 +140,30 @@ public class ArmSubsystem extends SubsystemBase
     )); //kS = 0.3,  kG = 0.5, kV = 0.8
   }
 
-  public Command armFeedForwardsFromElastic() 
-  {
-    return this.runOnce(() -> 
-    arm.getMotorController().setFeedforward(
-      armFeedForwardTuning.getFeedForward()[0],
-      armFeedForwardTuning.getFeedForward()[2],
-      armFeedForwardTuning.getFeedForward()[3],
-      armFeedForwardTuning.getFeedForward()[1]
-    ));
+  public Command armFeedForwardsFromElastic() {
+    return this.runOnce(() -> {
+      arm.getMotorController().setFeedforward(
+          armFeedForwardTuning.getFeedForward()[0],
+          armFeedForwardTuning.getFeedForward()[2],
+          armFeedForwardTuning.getFeedForward()[3],
+          armFeedForwardTuning.getFeedForward()[1]
+      );
+
+      System.out.println("arm kS: " + armFeedforward.getKs());
+      System.out.println("arm kV: " + armFeedforward.getKv());
+      System.out.println("arm kA: " + armFeedforward.getKa());
+      System.out.println("arm kG: " + armFeedforward.getKg());
+
+      arm.getMotorController().setFeedback(
+          armPIDtuning.getPID()[0],
+          armPIDtuning.getPID()[1],
+          armPIDtuning.getPID()[2]
+      );
+
+      System.out.println("arm P: " + armPID.getP());
+      System.out.println("arm I: " + armPID.getI());
+      System.out.println("arm D: " + armPID.getD());
+    });
   }
 
   public Command sysId()
