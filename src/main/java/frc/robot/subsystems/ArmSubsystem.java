@@ -156,9 +156,9 @@ private final Arm arm;
     return this.runOnce(() -> 
     arm.getMotorController().setFeedforward(
       armFeedForwardTuning.getFeedForward()[0],
-      armFeedForwardTuning.getFeedForward()[1],
       armFeedForwardTuning.getFeedForward()[2],
-      armFeedForwardTuning.getFeedForward()[3]
+      armFeedForwardTuning.getFeedForward()[3],
+      armFeedForwardTuning.getFeedForward()[1]
     )).andThen(() -> {
       System.out.println(armFeedForwardTuning.getFeedForward()[0]);
       System.out.println(armFeedForwardTuning.getFeedForward()[1]);
