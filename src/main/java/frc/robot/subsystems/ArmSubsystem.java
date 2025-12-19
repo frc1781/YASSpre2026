@@ -138,9 +138,9 @@ public class ArmSubsystem extends SubsystemBase
     return this.runOnce(() -> 
     arm.getMotorController().setFeedforward(
       armFeedForwardTuning.getFeedForward()[0],
-      armFeedForwardTuning.getFeedForward()[1],
       armFeedForwardTuning.getFeedForward()[2],
-      armFeedForwardTuning.getFeedForward()[3]
+      armFeedForwardTuning.getFeedForward()[3],
+      armFeedForwardTuning.getFeedForward()[1]
     ));
   }
 
