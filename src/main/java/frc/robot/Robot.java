@@ -50,7 +50,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-    theRobotContainer.setMotorBrake(true);
     disabledTimer.reset();
     disabledTimer.start();
   }
@@ -58,7 +57,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledPeriodic() {
     if (disabledTimer.hasElapsed(Constants.DrivebaseConstants.WHEEL_LOCK_TIME)) {
-      theRobotContainer.setMotorBrake(false);
       disabledTimer.stop();
       disabledTimer.reset();
     }
@@ -66,7 +64,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    theRobotContainer.setMotorBrake(true);
     exampleAuto = theRobotContainer.getAutonomousCommand();
 
     if (exampleAuto != null) {
@@ -80,7 +77,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    theRobotContainer.setMotorBrake(true);
     if (exampleAuto != null) {
       exampleAuto.cancel();
     } 
