@@ -24,6 +24,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import CRA.FeedForwardTuning;
 import CRA.PIDTuning;
@@ -65,21 +66,20 @@ public class Shooter extends SubsystemBase {
   // ExponentiallyProfiledArmSubsystem
 
   SmartMotorControllerConfig smcConfig;
-  SmartMotorControllerConfig smcConfig2;
 
   // Vendor motor controller object
   SparkFlex topShooter;
   SparkFlex bottomShooter;
 
+  SparkFlexConfig topShooterConfig;
+  SparkFlexConfig bottomShooterConfig;
+
   // Create our SmartMotorController from our Spark and config with the NEO.
   SmartMotorController sparkSmartMotorController;
-  SmartMotorController sparkSmartMotorController2;
   FlyWheelConfig shooterConfig;
-  FlyWheelConfig shooterConfig2;
 
   // Shooter Mechanism
   private FlyWheel shooter;
-  private FlyWheel shooter2;
 
   public Shooter() {
 
@@ -112,47 +112,35 @@ public class Shooter extends SubsystemBase {
         .withClosedLoopRampRate(Seconds.of(0.25))
         .withOpenLoopRampRate(Seconds.of(0.25));
 
-    smcConfig2 = new SmartMotorControllerConfig(this)
-        .withControlMode(ControlMode.CLOSED_LOOP)
-        // Feedback Constants (PID Constants)
-        .withClosedLoopController(shooterPID.getP(), shooterPID.getI(), shooterPID.getD(), DegreesPerSecond.of(90),
-            DegreesPerSecondPerSecond.of(45))
-        .withSimClosedLoopController(0, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
-        // Feedforward Constants
-        .withFeedforward(shooterFeedforward)
-        .withSimFeedforward(shooterFeedforward)
-        // Telemetry name and verbosity level
-        .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
-        // Gearing from the motor rotor to final shaft.
-        // In this example gearbox(3,4) is the same as gearbox("3:1","4:1") which
-        // corresponds to the gearbox attached to your motor.
-        .withGearing(new MechanismGearing(GearBox.fromReductionStages(1)))
-        // Motor properties to prevent over currenting.
-        .withMotorInverted(true)
-        .withIdleMode(MotorMode.COAST)
-        .withStatorCurrentLimit(Amps.of(40))
-        .withClosedLoopRampRate(Seconds.of(0.25))
-        .withOpenLoopRampRate(Seconds.of(0.25));
-
     // Vendor motor controller object
     topShooter = new SparkFlex(42, MotorType.kBrushless);
+    topShooterConfig = new SparkFlexConfig();
+    topShooterConfig.softLimit.forwardSoftLimitEnabled(true);
+    topShooterConfig.softLimit.forwardSoftLimit(30);
+    topShooterConfig.softLimit.reverseSoftLimit(30);
+    topShooterConfig.softLimit.reverseSoftLimitEnabled(true);
+    topShooterConfig.idleMode(IdleMode.kCoast);
+    topShooter.configure(topShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
     bottomShooter = new SparkFlex(43, MotorType.kBrushless);
+
+    bottomShooterConfig = new SparkFlexConfig();
+    bottomShooterConfig.softLimit.forwardSoftLimitEnabled(true);
+    bottomShooterConfig.softLimit.forwardSoftLimit(30);
+    bottomShooterConfig.softLimit.reverseSoftLimit(30);
+    bottomShooterConfig.softLimit.reverseSoftLimitEnabled(true);
+    bottomShooterConfig.follow(topShooter, true);
+    bottomShooterConfig.idleMode(IdleMode.kCoast);
+    bottomShooter.configure(bottomShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
 
     // Create our SmartMotorController from our Spark and config with the NEO.
     sparkSmartMotorController = new SparkWrapper(topShooter, DCMotor.getNEO(1), smcConfig);
-    sparkSmartMotorController2 = new SparkWrapper(bottomShooter, DCMotor.getNEO(1), smcConfig2);
+    // sparkSmartMotorController2 = new SparkWrapper(bottomShooter, DCMotor.getNEO(1), smcConfig2);
 
     shooterConfig = new FlyWheelConfig(sparkSmartMotorController)
-        // Diameter of the flywheel.
-        .withDiameter(Inches.of(4))
-        // Mass of the flywheel.
-        .withMass(Pounds.of(1))
-        // Maximum speed of the shooter.
-        .withUpperSoftLimit(RPM.of(1000))
-        // Telemetry name and verbosity for the arm.
-        .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
-    
-        shooterConfig2 = new FlyWheelConfig(sparkSmartMotorController2)
         // Diameter of the flywheel.
         .withDiameter(Inches.of(4))
         // Mass of the flywheel.
@@ -164,8 +152,6 @@ public class Shooter extends SubsystemBase {
 
     // Shooter Mechanism
     shooter = new FlyWheel(shooterConfig);
-    shooter2 = new FlyWheel(shooterConfig2);
-
     shooterVoltageSet = tab.add(getName() + "shooterVoltageSet", shooter.getMotor().getVoltage().in(Volts)).getEntry();
   }
 
@@ -174,15 +160,12 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/velocity", shooter.getMotor().getMechanismVelocity());
     Logger.recordOutput("Shooter/volts", shooter.getMotor().getVoltage());
     Logger.recordOutput("Shooter/desiredvoltage", shooterVoltageSet.getDouble(0));
-    Logger.recordOutput("Shooter/velocity", shooter2.getMotor().getMechanismVelocity());
-    Logger.recordOutput("Shooter/volts", shooter2.getMotor().getVoltage());
     Logger.recordOutput("Shooter/desiredvoltage", shooterVoltageSet.getDouble(0));
     shooter.updateTelemetry();
-    shooter2.updateTelemetry();
   }
 
   public Command shooterVoltageFromElastic() {
-    return shooter.setVoltage(() -> Volts.of(shooterVoltageSet.getDouble(0))).alongWith(shooter2.setVoltage(() -> Volts.of(shooterVoltageSet.getDouble(0))));
+    return shooter.setVoltage(() -> Volts.of(shooterVoltageSet.getDouble(0)));
   }
 
   public Command shooterFeedForwardsFromElastic() {
@@ -213,23 +196,23 @@ public class Shooter extends SubsystemBase {
   }
 
   public AngularVelocity getBottomVelocity() {
-    return shooter2.getSpeed();
+    return AngularVelocity.ofBaseUnits(bottomShooter.getEncoder().getVelocity(), RotationsPerSecond);
   }
 
   public Command setVelocity(AngularVelocity speed) {
-    return shooter.setSpeed(speed).alongWith(shooter2.setSpeed(speed));
+    return shooter.setSpeed(speed);
   }
 
   public Command setDutyCycle(double dutyCycle) {
-    return shooter.set(dutyCycle).alongWith(shooter2.set(dutyCycle));
+    return shooter.set(dutyCycle);
   }
 
   public Command setVelocity(Supplier<AngularVelocity> speed) {
-    return shooter.setSpeed(speed).alongWith(shooter2.setSpeed(speed));
+    return shooter.setSpeed(speed);
   }
 
   public Command setDutyCycle(Supplier<Double> dutyCycle) {
-    return shooter.set(dutyCycle).alongWith(shooter2.set(dutyCycle));
+    return shooter.set(dutyCycle);
   }
 
   @Override
